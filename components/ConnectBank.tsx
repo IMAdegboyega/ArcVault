@@ -45,7 +45,7 @@ const ConnectBank = ({ user, variant }: PlaidLinkProps) => {
       const res = await apiConnectBank(linkToken, selected.id);
       if (res.success) {
         setStep('success');
-        setTimeout(() => { setIsOpen(false); router.push('/'); router.refresh(); }, 1800);
+        setTimeout(() => { setIsOpen(false); router.push('/'); router.refresh(); }, 3000);
       } else {
         setError(res.error?.message || 'Connection failed. Please try again.');
       }

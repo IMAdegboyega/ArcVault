@@ -8,6 +8,7 @@ import HeaderBox from '@/components/HeaderBox';
 import TotalBalanceBox from '@/components/TotalBalanceBox';
 import RecentTransactions from '@/components/RecentTransactions';
 import RightSidebar from '@/components/RightSidebar';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const Home = () => {
   const { user } = useAuth();
@@ -44,8 +45,39 @@ const Home = () => {
 
   if (loading) {
     return (
-      <div className="flex h-full w-full items-center justify-center">
-        <div className="size-8 animate-spin rounded-full border-[3px] border-blue-600 border-t-transparent" />
+      <div className="flex w-full">
+        <div className="no-scrollbar flex flex-1 flex-col gap-8 px-5 py-8 sm:px-8 lg:py-10">
+          <div className="flex flex-col gap-2">
+            <Skeleton className="h-6 w-44" />
+            <Skeleton className="h-4 w-72" />
+          </div>
+          <div className="flex flex-col gap-6 rounded-2xl border border-gray-100 bg-white p-6 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-3">
+              <Skeleton className="h-4 w-28" />
+              <Skeleton className="h-9 w-52" />
+              <Skeleton className="h-4 w-20" />
+            </div>
+            <Skeleton className="size-36 rounded-full self-center" />
+          </div>
+          <div className="flex flex-col gap-4 rounded-2xl border border-gray-100 bg-white p-6">
+            <Skeleton className="h-5 w-40" />
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="flex items-center gap-4">
+                <Skeleton className="size-10 rounded-full shrink-0" />
+                <div className="flex flex-1 flex-col gap-2">
+                  <Skeleton className="h-4 w-36" />
+                  <Skeleton className="h-3 w-24" />
+                </div>
+                <Skeleton className="h-4 w-16" />
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="hidden xl:flex xl:w-[355px] xl:shrink-0 xl:flex-col xl:gap-6 xl:border-l xl:border-gray-100 xl:p-6">
+          <Skeleton className="h-32 rounded-2xl" />
+          <Skeleton className="h-52 rounded-2xl" />
+          <Skeleton className="h-40 rounded-2xl" />
+        </div>
       </div>
     );
   }

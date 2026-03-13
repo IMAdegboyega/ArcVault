@@ -135,7 +135,7 @@ export const createLinkToken = async (user: User) => {
   try {
     const tokenParams = {
       user: {
-        client_user_id: user.$id
+        client_user_id: user.$id!
       },
       client_name: `${user.firstName} ${user.lastName}`,
       products: ['auth'] as Products[],
@@ -214,7 +214,7 @@ export const exchangePublicToken = async ({
 
      // Create a funding source URL for the account using the Dwolla customer ID, processor token, and bank name
      const fundingSourceUrl = await addFundingSource({
-      dwollaCustomerId: user.dwollaCustomerId,
+      dwollaCustomerId: user.dwollaCustomerId!,
       processorToken,
       bankName: accountData.name,
     });
@@ -224,7 +224,7 @@ export const exchangePublicToken = async ({
 
     // Create a bank account using the user ID, item ID, account ID, access token, funding source URL, and shareableId ID
     await createBankAccount({
-      userId: user.$id,
+      userId: user.$id!,
       bankId: itemId,
       accountId: accountData.account_id,
       accessToken,

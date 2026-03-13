@@ -135,6 +135,14 @@ export function decryptId(id: string) {
   return atob(id);
 }
 
+export const parseStringify = (value: unknown) =>
+  JSON.parse(JSON.stringify(value));
+
+export const extractCustomerIdFromUrl = (url: string) => {
+  const parts = url.split("/");
+  return parts[parts.length - 1];
+};
+
 export const getTransactionStatus = (date: Date) => {
   const today = new Date();
   const twoDaysAgo = new Date(today);

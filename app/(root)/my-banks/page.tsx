@@ -7,6 +7,7 @@ import HeaderBox from '@/components/HeaderBox';
 import BankCard from '@/components/BankCard';
 import ConnectBank from '@/components/ConnectBank';
 import { formatAmount } from '@/lib/utils';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const MyBanks = () => {
   const { user } = useAuth();
@@ -23,7 +24,7 @@ const MyBanks = () => {
   const totalBalance = accounts.reduce((sum, a) => sum + (a.currentBalance || 0), 0);
 
   return (
-    <div className="no-scrollbar flex flex-col gap-6 p-5 py-8 sm:px-8 lg:py-10 xl:max-h-screen xl:overflow-y-auto">
+    <div className="no-scrollbar flex flex-col gap-8 p-5 py-8 sm:px-8 lg:py-10 xl:max-h-screen xl:overflow-y-auto">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <HeaderBox title="My Bank Accounts" subtext="Manage your linked bank accounts effortlessly." />
         {user && <ConnectBank user={user} variant="ghost" />}
@@ -32,15 +33,15 @@ const MyBanks = () => {
       {/* Summary row */}
       {!loading && accounts.length > 0 && (
         <div className="grid grid-cols-3 gap-3">
-          <div className="rounded-xl border border-gray-100 bg-white px-4 py-4">
+          <div className="rounded-2xl border border-gray-100 bg-white px-4 py-4">
             <p className="text-[11px] font-medium uppercase tracking-wider text-gray-400">Total Balance</p>
             <p className="mt-1 text-xl font-bold text-gray-900">{formatAmount(totalBalance)}</p>
           </div>
-          <div className="rounded-xl border border-gray-100 bg-white px-4 py-4">
+          <div className="rounded-2xl border border-gray-100 bg-white px-4 py-4">
             <p className="text-[11px] font-medium uppercase tracking-wider text-gray-400">Accounts</p>
             <p className="mt-1 text-xl font-bold text-gray-900">{accounts.length}</p>
           </div>
-          <div className="rounded-xl border border-gray-100 bg-white px-4 py-4">
+          <div className="rounded-2xl border border-gray-100 bg-white px-4 py-4">
             <p className="text-[11px] font-medium uppercase tracking-wider text-gray-400">Primary</p>
             <p className="mt-1 truncate text-base font-bold text-gray-900">{accounts[0]?.name || '—'}</p>
           </div>
@@ -48,9 +49,14 @@ const MyBanks = () => {
       )}
 
       {loading ? (
-        <div className="flex justify-center py-20">
-          <div className="size-8 animate-spin rounded-full border-[3px] border-blue-600 border-t-transparent" />
-        </div>
+        <>
+          <div className="grid grid-cols-3 gap-3">
+            {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-20 rounded-xl" />)}
+          </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-52 rounded-2xl" />)}
+          </div>
+        </>
       ) : accounts.length > 0 ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {accounts.map((account) => (

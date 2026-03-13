@@ -36,7 +36,7 @@ const RightSidebar = ({ user, transactions, banks }: RightSidebarProps) => {
               <Link
                 key={bank.id}
                 href={`/transaction-history?id=${bank.id}`}
-                className="flex items-center gap-3 rounded-xl border border-gray-100 bg-white p-3 transition-all hover:border-blue-100 hover:bg-blue-50/30 hover:shadow-sm"
+                className="flex items-center gap-3 rounded-2xl border border-gray-100 bg-white p-3 transition-all hover:border-blue-100 hover:bg-blue-50/30 hover:shadow-sm"
               >
                 <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-blue-500 text-sm font-bold text-white shadow-sm">
                   {bank.name[0]}

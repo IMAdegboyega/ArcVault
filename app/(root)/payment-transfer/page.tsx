@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { apiGetAccounts } from '@/lib/api';
 import HeaderBox from '@/components/HeaderBox';
 import PaymentTransferForm from '@/components/PaymentTransferForm';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const PaymentTransfer = () => {
   const [accounts, setAccounts] = useState<Account[]>([]);
@@ -21,8 +22,21 @@ const PaymentTransfer = () => {
       <HeaderBox title="Transfer Funds" subtext="Send money to other ArcVault users securely and instantly." />
 
       {loading ? (
-        <div className="flex justify-center py-20">
-          <div className="size-8 animate-spin rounded-full border-[3px] border-blue-600 border-t-transparent" />
+        <div className="flex flex-col gap-5">
+          <Skeleton className="h-32 rounded-2xl" />
+          <div className="flex flex-col gap-4 rounded-2xl border border-gray-100 bg-white p-6">
+            <Skeleton className="h-5 w-36" />
+            <Skeleton className="h-4 w-56" />
+            <div className="mt-2 flex flex-col gap-4 max-w-[500px]">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="flex flex-col gap-1.5">
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-11 rounded-lg" />
+                </div>
+              ))}
+            </div>
+          </div>
+          <Skeleton className="h-12 max-w-[500px] rounded-lg" />
         </div>
       ) : accounts.length > 0 ? (
         <PaymentTransferForm accounts={accounts} />

@@ -7,6 +7,7 @@ import HeaderBox from '@/components/HeaderBox';
 import TransactionsTable from '@/components/TransactionsTable';
 import { Pagination } from '@/components/Pagination';
 import { formatAmount } from '@/lib/utils';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const TransactionHistory = () => {
   const searchParams = useSearchParams();
@@ -48,12 +49,30 @@ const TransactionHistory = () => {
   const activeId = accountId || accounts[0]?.id;
 
   return (
-    <div className="no-scrollbar flex flex-col gap-6 p-5 py-8 sm:px-8 lg:py-10 xl:max-h-screen xl:overflow-y-auto">
+    <div className="no-scrollbar flex flex-col gap-8 p-5 py-8 sm:px-8 lg:py-10 xl:max-h-screen xl:overflow-y-auto">
       <HeaderBox title="Transaction History" subtext="View detailed transaction records across your accounts." />
 
       {loading ? (
-        <div className="flex justify-center py-20">
-          <div className="size-8 animate-spin rounded-full border-[3px] border-blue-600 border-t-transparent" />
+        <div className="flex flex-col gap-4">
+          <Skeleton className="h-24 rounded-2xl" />
+          <div className="flex gap-2">
+            {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-9 w-28 rounded-full" />)}
+          </div>
+          <div className="rounded-2xl border border-gray-100 bg-white">
+            <div className="flex flex-col gap-px">
+              {[...Array(8)].map((_, i) => (
+                <div key={i} className="flex items-center gap-4 px-6 py-4">
+                  <Skeleton className="size-9 rounded-full shrink-0" />
+                  <div className="flex flex-1 flex-col gap-2">
+                    <Skeleton className="h-4 w-40" />
+                    <Skeleton className="h-3 w-24" />
+                  </div>
+                  <Skeleton className="h-4 w-20" />
+                  <Skeleton className="h-6 w-16 rounded-full" />
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       ) : (
         <>

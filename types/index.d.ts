@@ -32,6 +32,9 @@ declare type LoginUser = {
 // ========================================
 
 declare type User = {
+  $id?: string;
+  $createdAt?: string;
+  $updatedAt?: string;
   id: string;
   email: string;
   firstName: string;
@@ -42,6 +45,8 @@ declare type User = {
   postalCode?: string;
   dateOfBirth?: string;
   paymentCustomerId?: string;
+  dwollaCustomerId?: string;
+  dwollaCustomerUrl?: string;
   createdAt: string;
 };
 
@@ -74,6 +79,8 @@ declare type AccountTypes =
 // ========================================
 
 declare type Transaction = {
+  $id?: string;
+  $createdAt?: string;
   id: string;
   name: string;
   paymentChannel: string;
@@ -85,6 +92,8 @@ declare type Transaction = {
   channel: string;
   merchantName?: string;
   bankAccountId: string;
+  senderBankId?: string;
+  receiverBankId?: string;
 };
 
 // ========================================
@@ -231,3 +240,107 @@ declare interface DoughnutChartProps {
 declare interface PaymentTransferFormProps {
   accounts: Account[];
 }
+
+// ========================================
+// Appwrite Document Shape
+// ========================================
+
+declare type AppwriteDoc = {
+  $id: string;
+  $createdAt: string;
+  $updatedAt: string;
+};
+
+declare type Bank = AppwriteDoc & {
+  accountId: string;
+  bankId: string;
+  accessToken: string;
+  fundingSourceUrl: string;
+  userId: string;
+  shareableId: string;
+};
+
+// ========================================
+// Extended User (includes Appwrite fields)
+// ========================================
+
+declare type AppwriteUser = User &
+  AppwriteDoc & {
+    dwollaCustomerId: string;
+    dwollaCustomerUrl: string;
+  };
+
+// ========================================
+// Action Props
+// ========================================
+
+declare type getUserInfoProps = { userId: string };
+declare type signInProps = { email: string; password: string };
+declare type getBanksProps = { userId: string };
+declare type getBankProps = { documentId: string };
+declare type getBankByAccountIdProps = { accountId: string };
+declare type getAccountsProps = { userId: string };
+declare type getAccountProps = { appwriteItemId: string };
+declare type getInstitutionProps = { institutionId: string };
+declare type getTransactionsProps = { accessToken: string };
+declare type getTransactionsByBankIdProps = { bankId: string };
+
+declare type createBankAccountProps = {
+  userId: string;
+  bankId: string;
+  accountId: string;
+  accessToken: string;
+  fundingSourceUrl: string;
+  shareableId: string;
+};
+
+declare type exchangePublicTokenProps = {
+  publicToken: string;
+  user: User;
+};
+
+declare type CreateTransactionProps = {
+  name: string;
+  amount: number;
+  senderId: string;
+  senderBankId: string;
+  receiverId: string;
+  receiverBankId: string;
+  email: string;
+};
+
+// ========================================
+// Dwolla
+// ========================================
+
+declare type NewDwollaCustomerParams = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  type: string;
+  address1: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  dateOfBirth: string;
+  ssn: string;
+};
+
+declare type CreateFundingSourceOptions = {
+  customerId: string;
+  fundingSourceName: string;
+  plaidToken: string;
+  _links?: Record<string, unknown>;
+};
+
+declare type TransferParams = {
+  sourceFundingSourceUrl: string;
+  destinationFundingSourceUrl: string;
+  amount: string;
+};
+
+declare type AddFundingSourceParams = {
+  dwollaCustomerId: string;
+  processorToken: string;
+  bankName: string;
+};
