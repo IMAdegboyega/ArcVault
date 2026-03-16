@@ -1,5 +1,18 @@
+'use client';
+
+import { motion } from 'framer-motion';
 import { formatAmount, formatDateTime, getTransactionStatus, removeSpecialCharacters } from '@/lib/utils';
 import { transactionCategoryStyles } from '@/constants';
+
+const rowVariants = {
+  hidden: { opacity: 0, y: 8 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.2, ease: 'easeOut' } },
+};
+
+const containerVariants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.04 } },
+};
 
 const StatusBadge = ({ status }: { status: string }) => {
   const isSuccess = status === 'Success';
@@ -49,13 +62,18 @@ const TransactionsTable = ({ transactions }: TransactionTableProps) => {
               <th className="hidden px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-gray-500 md:table-cell">Category</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-50">
+          <motion.tbody
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="divide-y divide-gray-50"
+          >
             {transactions.map((t) => {
               const status = getTransactionStatus(new Date(t.date));
               const isDebit = t.amount > 0;
               const initial = removeSpecialCharacters(t.name)[0]?.toUpperCase() || '?';
               return (
-                <tr key={t.id} className="transition-colors hover:bg-gray-50/60">
+                <motion.tr key={t.id} variants={rowVariants} className="transition-colors hover:bg-gray-50/60">
                   <td className="px-5 py-3.5">
                     <div className="flex items-center gap-3">
                       <div className={`flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white ${isDebit ? 'bg-rose-400' : 'bg-emerald-400'}`}>
@@ -78,10 +96,10 @@ const TransactionsTable = ({ transactions }: TransactionTableProps) => {
                   <td className="hidden px-5 py-3.5 md:table-cell">
                     <CategoryBadge category={t.category || 'Other'} />
                   </td>
-                </tr>
+                </motion.tr>
               );
             })}
-          </tbody>
+          </motion.tbody>
         </table>
       </div>
     </div>

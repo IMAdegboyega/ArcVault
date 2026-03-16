@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import TransactionsTable from './TransactionsTable';
 import { apiGetAccountTransactions } from '@/lib/api';
+import { AnimatePresence, motion } from 'framer-motion';
 
 const RecentTransactions = ({ accounts, transactions: initialTxns, selectedAccountId, page = 1 }: RecentTransactionsProps) => {
   const [activeId, setActiveId] = useState(selectedAccountId || accounts[0]?.id);
@@ -53,7 +54,17 @@ const RecentTransactions = ({ accounts, transactions: initialTxns, selectedAccou
         </div>
       )}
 
-      <TransactionsTable transactions={transactions} />
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeId}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2, ease: 'easeOut' }}
+        >
+          <TransactionsTable transactions={transactions} />
+        </motion.div>
+      </AnimatePresence>
     </section>
   );
 };

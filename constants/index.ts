@@ -19,6 +19,21 @@ export const sidebarLinks = [
     route: "/payment-transfer",
     label: "Transfer Funds",
   },
+  {
+    imgURL: "/icons/bank-transfer.svg",
+    route: "/transfer-history",
+    label: "Transfer History",
+  },
+  {
+    imgURL: "/icons/coins.svg",
+    route: "/analytics",
+    label: "Analytics",
+  },
+  {
+    imgURL: "/icons/edit.svg",
+    route: "/settings",
+    label: "Settings",
+  },
 ];
 
 export const topCategoryStyles = {

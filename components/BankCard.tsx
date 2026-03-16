@@ -8,7 +8,7 @@ const BankCard = ({ account, userName, showBalance = true }: CreditCardProps) =>
     <div className="flex flex-col">
       <Link
         href={`/transaction-history/?id=${account.id}`}
-        className="relative flex h-[190px] w-full justify-between overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400 shadow-lg shadow-blue-600/15 transition-transform duration-200 hover:scale-[1.01] hover:shadow-xl"
+        className="relative flex h-[190px] w-full justify-between overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400 shadow-lg shadow-blue-600/15 transition-[transform,box-shadow] duration-200 ease-out hover:scale-[1.02] hover:shadow-xl hover:shadow-blue-600/25 active:scale-[0.98] will-change-transform"
       >
         {/* Content */}
         <div className="relative z-10 flex flex-col justify-between p-5">

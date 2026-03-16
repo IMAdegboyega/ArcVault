@@ -4,8 +4,37 @@ import { useState } from 'react';
 import { apiCreateLinkToken, apiConnectBank } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { toast } from 'sonner';
 
 interface Institution { id: string; name: string; logo: string; }
+
+// #6 — Branded institution avatar colours
+const BANK_AVATARS: Record<string, { bg: string; label: string }> = {
+  chase:   { bg: '#1A73E8', label: 'C' },
+  bofa:    { bg: '#D31145', label: 'B' },
+  wells:   { bg: '#B71C1C', label: 'W' },
+  citi:    { bg: '#003B70', label: 'C' },
+  capital: { bg: '#004977', label: 'CO' },
+};
+
+const InstitutionAvatar = ({ logo, className = 'size-10' }: { logo: string; className?: string }) => {
+  const bank = BANK_AVATARS[logo];
+  if (bank) {
+    return (
+      <div
+        className={`${className} shrink-0 flex items-center justify-center rounded-lg text-xs font-bold text-white`}
+        style={{ backgroundColor: bank.bg }}
+      >
+        {bank.label}
+      </div>
+    );
+  }
+  return (
+    <div className={`${className} shrink-0 flex items-center justify-center rounded-lg bg-gray-100 text-xs font-bold text-gray-600`}>
+      {logo?.[0]?.toUpperCase() || '?'}
+    </div>
+  );
+};
 
 const ConnectBank = ({ user, variant }: PlaidLinkProps) => {
   const router = useRouter();
@@ -16,11 +45,9 @@ const ConnectBank = ({ user, variant }: PlaidLinkProps) => {
   const [linkToken, setLinkToken] = useState('');
   const [selected, setSelected] = useState<Institution | null>(null);
   const [step, setStep] = useState<'select' | 'confirm' | 'success'>('select');
-  const [error, setError] = useState('');
 
   const handleOpen = async () => {
     setIsLoading(true);
-    setError('');
     try {
       const res = await apiCreateLinkToken();
       if (res.success && res.data) {
@@ -29,9 +56,11 @@ const ConnectBank = ({ user, variant }: PlaidLinkProps) => {
         setIsOpen(true);
         setStep('select');
         setSelected(null);
+      } else {
+        toast.error(res.error?.message || 'Failed to load banks. Please try again.');
       }
-    } catch (err) {
-      console.error('Failed to create link token:', err);
+    } catch {
+      toast.error('Something went wrong. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -40,23 +69,22 @@ const ConnectBank = ({ user, variant }: PlaidLinkProps) => {
   const handleConnect = async () => {
     if (!selected || !linkToken) return;
     setIsConnecting(true);
-    setError('');
     try {
       const res = await apiConnectBank(linkToken, selected.id);
       if (res.success) {
         setStep('success');
-        setTimeout(() => { setIsOpen(false); router.push('/'); router.refresh(); }, 3000);
+        toast.success(`${selected.name} connected successfully!`);
+        setTimeout(() => { setIsOpen(false); router.push('/'); router.refresh(); }, 1500);
       } else {
-        setError(res.error?.message || 'Connection failed. Please try again.');
+        toast.error(res.error?.message || 'Connection failed. Please try again.');
       }
-    } catch (err) {
-      setError('Something went wrong. Please try again.');
+    } catch {
+      toast.error('Something went wrong. Please try again.');
     } finally {
       setIsConnecting(false);
     }
   };
 
-  // Trigger
   const Trigger = () => {
     if (variant === 'primary') {
       return (
@@ -96,7 +124,7 @@ const ConnectBank = ({ user, variant }: PlaidLinkProps) => {
                     {step === 'select' ? 'Link a Bank Account' : step === 'confirm' ? 'Confirm Connection' : 'Connected!'}
                   </h2>
                   <p className="text-xs text-gray-500">
-                    {step === 'select' ? `Step 1 of 2 — Choose your bank` : step === 'confirm' ? `Step 2 of 2 — Review & confirm` : `${selected?.name} linked`}
+                    {step === 'select' ? 'Step 1 of 2 — Choose your bank' : step === 'confirm' ? 'Step 2 of 2 — Review & confirm' : `${selected?.name} linked`}
                   </p>
                 </div>
               </div>
@@ -123,9 +151,7 @@ const ConnectBank = ({ user, variant }: PlaidLinkProps) => {
                   {institutions.map((inst) => (
                     <button key={inst.id} onClick={() => { setSelected(inst); setStep('confirm'); }}
                       className="flex items-center gap-3.5 rounded-xl border border-gray-100 p-3.5 text-left transition-all hover:border-blue-200 hover:bg-blue-50/40 active:scale-[0.99]">
-                      <div className="flex size-10 items-center justify-center rounded-lg bg-gray-50 text-xl">
-                        {inst.logo}
-                      </div>
+                      <InstitutionAvatar logo={inst.logo} className="size-10" />
                       <div className="flex-1">
                         <p className="text-sm font-semibold text-gray-900">{inst.name}</p>
                         <p className="text-[11px] text-gray-400">Checking & Savings</p>
@@ -139,18 +165,14 @@ const ConnectBank = ({ user, variant }: PlaidLinkProps) => {
               {/* STEP 2: Confirm */}
               {step === 'confirm' && selected && (
                 <div className="flex flex-col gap-4">
-                  {/* Selected bank summary */}
                   <div className="flex items-center gap-3.5 rounded-xl bg-blue-600 p-4 text-white shadow-md shadow-blue-600/20">
-                    <div className="flex size-11 items-center justify-center rounded-lg bg-white/20 text-xl backdrop-blur-sm">
-                      {selected.logo}
-                    </div>
+                    <InstitutionAvatar logo={selected.logo} className="size-11" />
                     <div>
                       <p className="text-sm font-semibold">{selected.name}</p>
                       <p className="text-xs text-white/70">Checking & Savings accounts</p>
                     </div>
                   </div>
 
-                  {/* What will happen */}
                   <div className="rounded-xl bg-gray-50 p-4">
                     <p className="text-xs font-medium text-gray-600 mb-2">What happens next:</p>
                     <div className="flex flex-col gap-2">
@@ -171,11 +193,6 @@ const ConnectBank = ({ user, variant }: PlaidLinkProps) => {
                     This is a simulated connection for demo purposes. No real data is accessed.
                   </p>
 
-                  {error && (
-                    <div className="rounded-lg border border-rose-100 bg-rose-50 px-3 py-2 text-xs text-rose-600">{error}</div>
-                  )}
-
-                  {/* Actions */}
                   <div className="flex gap-3">
                     <button onClick={() => setStep('select')}
                       className="flex-1 rounded-lg border border-gray-200 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50">

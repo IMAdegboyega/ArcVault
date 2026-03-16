@@ -13,13 +13,14 @@ import { useRouter } from 'next/navigation';
 import { apiLogin, apiRegister } from '@/lib/api';
 import { useAuth } from '@/lib/hooks/useAuth';
 import ConnectBank from './ConnectBank';
+import { motion } from 'framer-motion';
+import { toast } from 'sonner';
 
 const AuthForm = ({ type }: AuthFormProps) => {
   const router = useRouter();
   const { setUser } = useAuth();
   const [localUser, setLocalUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
 
   const formSchema = authFormSchema(type);
 
@@ -30,7 +31,6 @@ const AuthForm = ({ type }: AuthFormProps) => {
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setIsLoading(true);
-    setError('');
     try {
       if (type === 'sign-up') {
         const res = await apiRegister(data as SignUpParams);
@@ -38,7 +38,7 @@ const AuthForm = ({ type }: AuthFormProps) => {
           setLocalUser(res.data.user);
           setUser(res.data.user);
         } else {
-          setError(res.error?.message || 'Registration failed');
+          toast.error(res.error?.message || 'Registration failed');
         }
       } else {
         const res = await apiLogin({ email: data.email, password: data.password });
@@ -46,18 +46,23 @@ const AuthForm = ({ type }: AuthFormProps) => {
           setUser(res.data.user);
           router.push('/');
         } else {
-          setError(res.error?.message || 'Invalid credentials');
+          toast.error(res.error?.message || 'Invalid credentials');
         }
       }
     } catch {
-      setError('Something went wrong. Please try again.');
+      toast.error('Something went wrong. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <section className="flex w-full max-w-[420px] flex-col justify-center gap-6 py-10">
+    <motion.section
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, ease: 'easeOut' }}
+      className="flex w-full max-w-[420px] flex-col justify-center gap-6 py-10"
+    >
       {/* Logo + Header */}
       <header className="flex flex-col gap-6">
         <Link href="/" className="flex items-center gap-2">
@@ -102,14 +107,10 @@ const AuthForm = ({ type }: AuthFormProps) => {
               <CustomInput control={form.control} name="email" label="Email" placeholder="you@email.com" />
               <CustomInput control={form.control} name="password" label="Password" placeholder="Enter your password" />
 
-              {error && (
-                <div className="rounded-lg border border-rose-100 bg-rose-50 px-4 py-3 text-sm text-rose-600">{error}</div>
-              )}
-
               <button
                 type="submit"
                 disabled={isLoading}
-                className="mt-2 flex h-12 w-full items-center justify-center rounded-lg bg-blue-600 text-sm font-semibold text-white shadow-md shadow-blue-600/20 transition-all hover:bg-blue-700 disabled:opacity-60"
+                className="mt-2 flex h-12 w-full items-center justify-center rounded-lg bg-blue-600 text-sm font-semibold text-white shadow-md shadow-blue-600/20 transition-all duration-150 ease-out hover:bg-blue-700 hover:scale-[1.02] active:scale-[0.97] disabled:opacity-60 will-change-transform"
               >
                 {isLoading ? (
                   <div className="flex items-center gap-2">
@@ -129,7 +130,7 @@ const AuthForm = ({ type }: AuthFormProps) => {
           </p>
         </>
       )}
-    </section>
+    </motion.section>
   );
 };
 

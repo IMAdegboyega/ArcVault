@@ -1,9 +1,17 @@
+'use client';
+
+import { motion } from 'framer-motion';
 import AnimatedCounter from './AnimatedCounter';
 import DoughnutChart from './DoughnutChart';
 
 const TotalBalanceBox = ({ accounts = [], totalBanks, totalCurrentBalance }: TotalBalanceBoxProps) => {
   return (
-    <section className="flex w-full items-center gap-6 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm sm:p-7">
+    <motion.section
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, ease: 'easeOut' }}
+      className="flex w-full items-center gap-6 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm sm:p-7"
+    >
       <div className="flex size-full max-w-[120px] items-center sm:max-w-[140px]">
         {accounts.length > 0 ? (
           <DoughnutChart accounts={accounts} />
@@ -27,7 +35,7 @@ const TotalBalanceBox = ({ accounts = [], totalBanks, totalCurrentBalance }: Tot
           </div>
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 };
 

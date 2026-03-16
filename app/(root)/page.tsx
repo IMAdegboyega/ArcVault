@@ -8,6 +8,7 @@ import TransactionsTable from '@/components/TransactionsTable';
 import { Pagination } from '@/components/Pagination';
 import { formatAmount } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
+import { AnimatePresence, motion } from 'framer-motion';
 
 const TransactionHistory = () => {
   const searchParams = useSearchParams();
@@ -52,67 +53,83 @@ const TransactionHistory = () => {
     <div className="no-scrollbar flex flex-col gap-8 p-5 py-8 sm:px-8 lg:py-10 xl:max-h-screen xl:overflow-y-auto">
       <HeaderBox title="Transaction History" subtext="View detailed transaction records across your accounts." />
 
-      {loading ? (
-        <div className="flex flex-col gap-4">
-          <Skeleton className="h-24 rounded-2xl" />
-          <div className="flex gap-2">
-            {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-9 w-28 rounded-full" />)}
-          </div>
-          <div className="rounded-2xl border border-gray-100 bg-white">
-            <div className="flex flex-col gap-px">
-              {[...Array(8)].map((_, i) => (
-                <div key={i} className="flex items-center gap-4 px-6 py-4">
-                  <Skeleton className="size-9 rounded-full shrink-0" />
-                  <div className="flex flex-1 flex-col gap-2">
-                    <Skeleton className="h-4 w-40" />
-                    <Skeleton className="h-3 w-24" />
+      <AnimatePresence mode="wait">
+        {loading ? (
+          <motion.div
+            key="skeleton"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="flex flex-col gap-4"
+          >
+            <Skeleton className="h-24 rounded-2xl" />
+            <div className="flex gap-2">
+              {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-9 w-28 rounded-full" />)}
+            </div>
+            <div className="rounded-2xl border border-gray-100 bg-white">
+              <div className="flex flex-col gap-px">
+                {[...Array(8)].map((_, i) => (
+                  <div key={i} className="flex items-center gap-4 px-6 py-4">
+                    <Skeleton className="size-9 rounded-full shrink-0" />
+                    <div className="flex flex-1 flex-col gap-2">
+                      <Skeleton className="h-4 w-40" />
+                      <Skeleton className="h-3 w-24" />
+                    </div>
+                    <Skeleton className="h-4 w-20" />
+                    <Skeleton className="h-6 w-16 rounded-full" />
                   </div>
-                  <Skeleton className="h-4 w-20" />
-                  <Skeleton className="h-6 w-16 rounded-full" />
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="content"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+            className="flex flex-col gap-8"
+          >
+            {/* Account balance card */}
+            {selectedAccount && (
+              <div className="flex flex-col gap-4 rounded-2xl bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-500 px-6 py-5 text-white shadow-lg shadow-blue-600/15 md:flex-row md:items-center md:justify-between">
+                <div>
+                  <p className="text-sm font-medium text-white/70">{selectedAccount.officialName || selectedAccount.name}</p>
+                  <p className="mt-0.5 text-lg font-bold tracking-wide">●●●● ●●●● ●●●● {selectedAccount.mask}</p>
                 </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      ) : (
-        <>
-          {/* Account balance card */}
-          {selectedAccount && (
-            <div className="flex flex-col gap-4 rounded-2xl bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-500 px-6 py-5 text-white shadow-lg shadow-blue-600/15 md:flex-row md:items-center md:justify-between">
-              <div>
-                <p className="text-sm font-medium text-white/70">{selectedAccount.officialName || selectedAccount.name}</p>
-                <p className="mt-0.5 text-lg font-bold tracking-wide">●●●● ●●●● ●●●● {selectedAccount.mask}</p>
+                <div className="rounded-xl bg-white/15 px-5 py-3 backdrop-blur-sm">
+                  <p className="text-[11px] font-medium uppercase tracking-wider text-white/60">Current Balance</p>
+                  <p className="text-xl font-bold">{formatAmount(selectedAccount.currentBalance)}</p>
+                </div>
               </div>
-              <div className="rounded-xl bg-white/15 px-5 py-3 backdrop-blur-sm">
-                <p className="text-[11px] font-medium uppercase tracking-wider text-white/60">Current Balance</p>
-                <p className="text-xl font-bold">{formatAmount(selectedAccount.currentBalance)}</p>
+            )}
+
+            {/* Account tabs — visible, scrollable, never clipped */}
+            {accounts.length > 1 && (
+              <div className="flex w-full flex-wrap gap-2">
+                {accounts.map((acc) => (
+                  <a key={acc.id} href={`/transaction-history?id=${acc.id}`}
+                    className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-all ${
+                      acc.id === activeId
+                        ? 'border-blue-200 bg-blue-50 text-blue-700'
+                        : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50'
+                    }`}>
+                    <span className={`flex size-5 items-center justify-center rounded-full text-[10px] font-bold ${
+                      acc.id === activeId ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-500'
+                    }`}>{acc.name[0]}</span>
+                    {acc.name}
+                  </a>
+                ))}
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Account tabs — visible, scrollable, never clipped */}
-          {accounts.length > 1 && (
-            <div className="flex w-full flex-wrap gap-2">
-              {accounts.map((acc) => (
-                <a key={acc.id} href={`/transaction-history?id=${acc.id}`}
-                  className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-all ${
-                    acc.id === activeId
-                      ? 'border-blue-200 bg-blue-50 text-blue-700'
-                      : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50'
-                  }`}>
-                  <span className={`flex size-5 items-center justify-center rounded-full text-[10px] font-bold ${
-                    acc.id === activeId ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-500'
-                  }`}>{acc.name[0]}</span>
-                  {acc.name}
-                </a>
-              ))}
-            </div>
-          )}
-
-          <TransactionsTable transactions={transactions} />
-          <Pagination page={currentPage} totalPages={totalPages} />
-        </>
-      )}
+            <TransactionsTable transactions={transactions} />
+            <Pagination page={currentPage} totalPages={totalPages} />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

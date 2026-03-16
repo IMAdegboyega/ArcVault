@@ -1,16 +1,18 @@
 'use client';
 
 import { useAuth } from "@/lib/hooks/useAuth";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useEffect } from "react";
 import Sidebar from "@/components/Sidebar";
 import MobileNav from "@/components/MobileNav";
 import Image from "next/image";
 import Link from "next/link";
+import { AnimatePresence, motion } from "framer-motion";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const { user, isLoading, isAuthenticated } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -43,9 +45,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </Link>
           <MobileNav user={user} />
         </header>
-        <div className="flex-1 overflow-y-auto bg-gray-50/60">
-          {children}
-        </div>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={pathname}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+            className="flex-1 overflow-y-auto bg-gray-50/60"
+          >
+            {children}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </main>
   );
