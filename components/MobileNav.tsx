@@ -16,16 +16,16 @@ const MobileNav = ({ user }: MobileNavProps) => {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <button className="flex size-9 items-center justify-center rounded-lg hover:bg-gray-50">
-          <Image src="/icons/hamburger.svg" width={22} height={22} alt="Menu" />
+        <button className="flex size-9 items-center justify-center rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800">
+          <Image src="/icons/hamburger.svg" width={22} height={22} alt="Menu" className="dark:invert" />
         </button>
       </SheetTrigger>
-      <SheetContent side="left" className="w-[280px] border-none bg-white p-0">
+      <SheetContent side="left" className="w-[280px] border-none bg-white p-0 dark:bg-gray-900">
         <div className="flex h-full flex-col justify-between">
           <div>
             <Link href="/" onClick={() => setOpen(false)} className="flex items-center gap-2 px-6 py-7">
               <Image src="/icons/logo.svg" width={28} height={28} alt="ArcVault" />
-              <span className="text-lg font-bold font-ibm-plex-serif text-gray-900">ArcVault</span>
+              <span className="text-lg font-bold font-ibm-plex-serif text-gray-900 dark:text-white">ArcVault</span>
             </Link>
             <nav className="flex flex-col gap-1 px-4">
               {sidebarLinks.map((item) => {
@@ -36,12 +36,12 @@ const MobileNav = ({ user }: MobileNavProps) => {
                       href={item.route}
                       className={cn(
                         'flex items-center gap-3 rounded-lg px-3 py-2.5 transition-all',
-                        isActive ? 'bg-blue-600 shadow-md shadow-blue-600/20' : 'hover:bg-gray-50'
+                        isActive ? 'bg-blue-600 shadow-md shadow-blue-600/20' : 'hover:bg-gray-50 dark:hover:bg-gray-800'
                       )}
                     >
                       <Image src={item.imgURL} alt="" width={20} height={20}
-                        className={cn(isActive ? 'brightness-0 invert' : 'opacity-50')} />
-                      <span className={cn('text-sm font-semibold', isActive ? 'text-white' : 'text-gray-600')}>
+                        className={cn(isActive ? 'brightness-0 invert' : 'opacity-50 dark:opacity-40')} />
+                      <span className={cn('text-sm font-semibold', isActive ? 'text-white' : 'text-gray-600 dark:text-gray-300')}>
                         {item.label}
                       </span>
                     </Link>

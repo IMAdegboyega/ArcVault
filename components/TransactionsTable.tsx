@@ -18,7 +18,7 @@ const StatusBadge = ({ status }: { status: string }) => {
   const isSuccess = status === 'Success';
   return (
     <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${
-      isSuccess ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'
+      isSuccess ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400' : 'bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-400'
     }`}>
       <span className={`size-1.5 rounded-full ${isSuccess ? 'bg-emerald-500' : 'bg-amber-500'}`} />
       {status}
@@ -39,47 +39,47 @@ const CategoryBadge = ({ category }: CategoryBadgeProps) => {
 const TransactionsTable = ({ transactions }: TransactionTableProps) => {
   if (transactions.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-white py-16">
-        <div className="mb-3 flex size-12 items-center justify-center rounded-full bg-gray-50">
+      <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-white py-16 dark:border-gray-700 dark:bg-gray-900">
+        <div className="mb-3 flex size-12 items-center justify-center rounded-full bg-gray-50 dark:bg-gray-800">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M12 18v-6"/><path d="m9 15 3-3 3 3"/></svg>
         </div>
-        <p className="text-sm font-medium text-gray-400">No transactions yet</p>
-        <p className="mt-0.5 text-xs text-gray-300">Connect a bank to see activity</p>
+        <p className="text-sm font-medium text-gray-400 dark:text-gray-500">No transactions yet</p>
+        <p className="mt-0.5 text-xs text-gray-300 dark:text-gray-600">Connect a bank to see activity</p>
       </div>
     );
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white">
+    <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white dark:border-gray-800 dark:bg-gray-900">
       <div className="overflow-x-auto">
         <table className="w-full min-w-[640px]">
           <thead>
-            <tr className="border-b border-gray-100 bg-gray-50/70">
-              <th className="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-gray-500">Transaction</th>
-              <th className="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-gray-500">Amount</th>
-              <th className="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-gray-500">Status</th>
-              <th className="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-gray-500">Date</th>
-              <th className="hidden px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-gray-500 md:table-cell">Category</th>
+            <tr className="border-b border-gray-100 bg-gray-50/70 dark:border-gray-800 dark:bg-gray-800/70">
+              <th className="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Transaction</th>
+              <th className="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Amount</th>
+              <th className="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Status</th>
+              <th className="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Date</th>
+              <th className="hidden px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-gray-500 md:table-cell dark:text-gray-400">Category</th>
             </tr>
           </thead>
           <motion.tbody
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="divide-y divide-gray-50"
+            className="divide-y divide-gray-50 dark:divide-gray-800"
           >
             {transactions.map((t) => {
               const status = getTransactionStatus(new Date(t.date));
               const isDebit = t.amount > 0;
               const initial = removeSpecialCharacters(t.name)[0]?.toUpperCase() || '?';
               return (
-                <motion.tr key={t.id} variants={rowVariants} className="transition-colors hover:bg-gray-50/60">
+                <motion.tr key={t.id} variants={rowVariants} className="transition-colors hover:bg-gray-50/60 dark:hover:bg-gray-800/60">
                   <td className="px-5 py-3.5">
                     <div className="flex items-center gap-3">
                       <div className={`flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white ${isDebit ? 'bg-rose-400' : 'bg-emerald-400'}`}>
                         {initial}
                       </div>
-                      <span className="truncate text-sm font-medium text-gray-900 max-w-[200px]">{t.name}</span>
+                      <span className="truncate text-sm font-medium text-gray-900 max-w-[200px] dark:text-white">{t.name}</span>
                     </div>
                   </td>
                   <td className="px-5 py-3.5">
@@ -91,7 +91,7 @@ const TransactionsTable = ({ transactions }: TransactionTableProps) => {
                     <StatusBadge status={status} />
                   </td>
                   <td className="px-5 py-3.5">
-                    <span className="text-sm text-gray-500">{formatDateTime(new Date(t.date)).dateOnly}</span>
+                    <span className="text-sm text-gray-500 dark:text-gray-400">{formatDateTime(new Date(t.date)).dateOnly}</span>
                   </td>
                   <td className="hidden px-5 py-3.5 md:table-cell">
                     <CategoryBadge category={t.category || 'Other'} />

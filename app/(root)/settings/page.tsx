@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -11,7 +11,7 @@ import { Form, FormControl, FormField, FormLabel, FormMessage } from '@/componen
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useTheme } from 'next-themes';
 
 const profileSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
@@ -25,8 +25,8 @@ const profileSchema = z.object({
 
 type ProfileData = z.infer<typeof profileSchema>;
 
-const field = (label: string, name: keyof ProfileData, placeholder: string, disabled = false) =>
-  ({ label, name, placeholder, disabled } as const);
+const field = (label: string, name: keyof ProfileData, placeholder: string) =>
+  ({ label, name, placeholder } as const);
 
 const FIELDS = [
   field('First Name', 'firstName', 'John'),
@@ -41,18 +41,14 @@ const FIELDS = [
 const Settings = () => {
   const { user, setUser } = useAuth();
   const [isSaving, setIsSaving] = useState(false);
+  const { theme, setTheme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
 
   const form = useForm<ProfileData>({
     resolver: zodResolver(profileSchema),
-    defaultValues: {
-      firstName: '',
-      lastName: '',
-      address1: '',
-      city: '',
-      state: '',
-      postalCode: '',
-      dateOfBirth: '',
-    },
+    defaultValues: { firstName: '', lastName: '', address1: '', city: '', state: '', postalCode: '', dateOfBirth: '' },
   });
 
   useEffect(() => {
@@ -86,6 +82,8 @@ const Settings = () => {
     }
   };
 
+  const isDark = resolvedTheme === 'dark';
+
   return (
     <div className="no-scrollbar flex flex-col gap-8 p-5 py-8 sm:px-8 lg:py-10 xl:max-h-screen xl:overflow-y-auto">
       <HeaderBox title="Settings" subtext="Manage your profile and account preferences." />
@@ -96,22 +94,62 @@ const Settings = () => {
         transition={{ duration: 0.25, ease: 'easeOut' }}
         className="flex flex-col gap-6"
       >
+        {/* Appearance */}
+        <div className="rounded-2xl border border-gray-100 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
+          <h3 className="text-base font-semibold text-gray-900 dark:text-white">Appearance</h3>
+          <p className="mt-0.5 text-sm text-gray-500 dark:text-gray-400">Choose your preferred colour scheme.</p>
+
+          <div className="mt-5 flex items-center justify-between max-w-[400px]">
+            <div className="flex items-center gap-3">
+              {mounted && (
+                <div className={`flex size-9 items-center justify-center rounded-lg transition-colors ${isDark ? 'bg-gray-800 text-gray-200' : 'bg-gray-100 text-gray-600'}`}>
+                  {isDark ? (
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+                  ) : (
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+                  )}
+                </div>
+              )}
+              <div>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  {mounted ? (isDark ? 'Dark mode' : 'Light mode') : 'Theme'}
+                </p>
+                <p className="text-xs text-gray-400 dark:text-gray-500">
+                  {theme === 'system' ? 'Following system setting' : 'Manually selected'}
+                </p>
+              </div>
+            </div>
+
+            {/* Toggle switch */}
+            {mounted && (
+              <button
+                role="switch"
+                aria-checked={isDark}
+                onClick={() => setTheme(isDark ? 'light' : 'dark')}
+                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${isDark ? 'bg-blue-600' : 'bg-gray-200'}`}
+              >
+                <span className={`pointer-events-none inline-block size-5 rounded-full bg-white shadow-lg ring-0 transition-transform duration-200 ${isDark ? 'translate-x-5' : 'translate-x-0'}`} />
+              </button>
+            )}
+          </div>
+        </div>
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-6">
             {/* Personal info */}
-            <div className="rounded-2xl border border-gray-100 bg-white p-6">
-              <h3 className="text-base font-semibold text-gray-900">Personal Information</h3>
-              <p className="mt-0.5 text-sm text-gray-500">Update your name and address details.</p>
+            <div className="rounded-2xl border border-gray-100 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
+              <h3 className="text-base font-semibold text-gray-900 dark:text-white">Personal Information</h3>
+              <p className="mt-0.5 text-sm text-gray-500 dark:text-gray-400">Update your name and address details.</p>
 
               <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 max-w-[680px]">
                 {FIELDS.map(({ label, name, placeholder }) => (
                   <FormField key={name} control={form.control} name={name} render={({ field: f, fieldState }) => (
                     <div className="flex flex-col gap-1.5">
-                      <FormLabel className="text-sm font-medium text-gray-700">{label}</FormLabel>
+                      <FormLabel className="text-sm font-medium text-gray-700 dark:text-gray-300">{label}</FormLabel>
                       <FormControl>
                         <Input
                           placeholder={placeholder}
-                          className={`h-11 rounded-lg border-gray-200 text-sm placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 ${fieldState.error ? 'border-rose-400' : ''}`}
+                          className={`h-11 rounded-lg border-gray-200 bg-white text-sm placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500 ${fieldState.error ? 'border-rose-400' : ''}`}
                           {...f}
                         />
                       </FormControl>
@@ -122,13 +160,13 @@ const Settings = () => {
 
                 {/* Email — read only */}
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-sm font-medium text-gray-700">Email</label>
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
                   <Input
                     value={user?.email || ''}
                     disabled
-                    className="h-11 rounded-lg border-gray-200 bg-gray-50 text-sm text-gray-500 cursor-not-allowed"
+                    className="h-11 rounded-lg border-gray-200 bg-gray-50 text-sm text-gray-500 cursor-not-allowed dark:border-gray-700 dark:bg-gray-800 dark:text-gray-500"
                   />
-                  <p className="text-xs text-gray-400">Email cannot be changed.</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500">Email cannot be changed.</p>
                 </div>
               </div>
             </div>
@@ -151,18 +189,18 @@ const Settings = () => {
           </form>
         </Form>
 
-        {/* Danger Zone */}
-        <div className="rounded-2xl border border-gray-100 bg-white p-6">
-          <h3 className="text-base font-semibold text-gray-900">Account Info</h3>
-          <p className="mt-0.5 text-sm text-gray-500">Read-only account metadata.</p>
+        {/* Account info */}
+        <div className="rounded-2xl border border-gray-100 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
+          <h3 className="text-base font-semibold text-gray-900 dark:text-white">Account Info</h3>
+          <p className="mt-0.5 text-sm text-gray-500 dark:text-gray-400">Read-only account metadata.</p>
           <div className="mt-4 flex flex-col gap-3 max-w-[500px]">
-            <div className="flex items-center justify-between rounded-lg bg-gray-50 px-4 py-3">
-              <span className="text-sm text-gray-500">User ID</span>
-              <span className="font-mono text-xs text-gray-700 select-all">{user?.id || '—'}</span>
+            <div className="flex items-center justify-between rounded-lg bg-gray-50 px-4 py-3 dark:bg-gray-800">
+              <span className="text-sm text-gray-500 dark:text-gray-400">User ID</span>
+              <span className="font-mono text-xs text-gray-700 select-all dark:text-gray-300">{user?.id || '—'}</span>
             </div>
-            <div className="flex items-center justify-between rounded-lg bg-gray-50 px-4 py-3">
-              <span className="text-sm text-gray-500">Member since</span>
-              <span className="text-sm font-medium text-gray-700">
+            <div className="flex items-center justify-between rounded-lg bg-gray-50 px-4 py-3 dark:bg-gray-800">
+              <span className="text-sm text-gray-500 dark:text-gray-400">Member since</span>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '—'}
               </span>
             </div>

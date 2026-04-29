@@ -150,16 +150,45 @@ export const getTransactionStatus = (date: Date) => {
   return date > twoDaysAgo ? "Processing" : "Success";
 };
 
+export type BankDesign = { gradient: string; shadow: string; hoverShadow: string; cardType: 'visa' | 'mastercard' };
+
+const BANK_DESIGNS: Record<string, BankDesign> = {
+  chase:   { gradient: 'from-blue-700 via-blue-600 to-blue-500',       shadow: 'shadow-blue-700/15',   hoverShadow: 'hover:shadow-blue-700/25',  cardType: 'visa' },
+  bofa:    { gradient: 'from-red-700 via-red-600 to-rose-500',          shadow: 'shadow-red-700/15',    hoverShadow: 'hover:shadow-red-700/25',   cardType: 'visa' },
+  wells:   { gradient: 'from-amber-600 via-orange-500 to-orange-400',   shadow: 'shadow-amber-600/15',  hoverShadow: 'hover:shadow-amber-600/25', cardType: 'visa' },
+  citi:    { gradient: 'from-slate-800 via-slate-700 to-blue-800',      shadow: 'shadow-slate-800/15',  hoverShadow: 'hover:shadow-slate-800/25', cardType: 'mastercard' },
+  capital: { gradient: 'from-teal-700 via-teal-600 to-emerald-500',     shadow: 'shadow-teal-700/15',   hoverShadow: 'hover:shadow-teal-700/25',  cardType: 'mastercard' },
+  default: { gradient: 'from-blue-600 via-blue-500 to-blue-400',        shadow: 'shadow-blue-600/15',   hoverShadow: 'hover:shadow-blue-600/25',  cardType: 'mastercard' },
+};
+
+export function getBankDesign(name: string): BankDesign {
+  const n = name.toLowerCase();
+  if (n.includes('chase')) return BANK_DESIGNS.chase;
+  if (n.includes('bank of america') || n.includes('bofa')) return BANK_DESIGNS.bofa;
+  if (n.includes('wells fargo') || n.includes('wells')) return BANK_DESIGNS.wells;
+  if (n.includes('citi')) return BANK_DESIGNS.citi;
+  if (n.includes('capital one') || n.includes('capital')) return BANK_DESIGNS.capital;
+  return BANK_DESIGNS.default;
+}
+
 export const authFormSchema = (type: string) =>
   z.object({
-    firstName: type === "sign-in" ? z.string().optional() : z.string().min(3),
-    lastName: type === "sign-in" ? z.string().optional() : z.string().min(3),
-    address1: type === "sign-in" ? z.string().optional() : z.string().max(50),
-    city: type === "sign-in" ? z.string().optional() : z.string().max(50),
-    state: type === "sign-in" ? z.string().optional() : z.string().min(2).max(2),
+    firstName: type === "sign-in" ? z.string().optional() : z.string().min(1, "First name is required").max(50),
+    lastName: type === "sign-in" ? z.string().optional() : z.string().min(1, "Last name is required").max(50),
+    address1: type === "sign-in" ? z.string().optional() : z.string().min(1, "Address is required").max(50),
+    city: type === "sign-in" ? z.string().optional() : z.string().min(1, "City is required").max(50),
+    state: type === "sign-in" ? z.string().optional() : z.string().length(2, "State must be a 2-letter code"),
     postalCode: type === "sign-in" ? z.string().optional() : z.string().min(3).max(6),
-    dateOfBirth: type === "sign-in" ? z.string().optional() : z.string().min(3),
-    ssn: type === "sign-in" ? z.string().optional() : z.string().min(3),
+    dateOfBirth: type === "sign-in" ? z.string().optional() : z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Use YYYY-MM-DD"),
+    ssn: type === "sign-in" ? z.string().optional() : z.string().regex(/^\d{4}$/, "Enter the last 4 digits of your SSN (4 digits, no dashes)"),
     email: z.string().email(),
-    password: z.string().min(8),
+    password:
+      type === "sign-in"
+        ? z.string().min(1, "Password is required")
+        : z
+            .string()
+            .min(8, "Password must be at least 8 characters")
+            .regex(/[A-Z]/, "Must contain at least one uppercase letter")
+            .regex(/[a-z]/, "Must contain at least one lowercase letter")
+            .regex(/[0-9]/, "Must contain at least one number"),
   });

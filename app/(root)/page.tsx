@@ -2,20 +2,23 @@
 
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { apiGetAccounts, apiGetAccount, apiGetAccountTransactions } from '@/lib/api';
+import { useAuth } from '@/lib/hooks/useAuth';
+import { apiGetAccounts, apiGetAccountTransactions } from '@/lib/api';
 import HeaderBox from '@/components/HeaderBox';
-import TransactionsTable from '@/components/TransactionsTable';
-import { Pagination } from '@/components/Pagination';
-import { formatAmount } from '@/lib/utils';
+import TotalBalanceBox from '@/components/TotalBalanceBox';
+import RecentTransactions from '@/components/RecentTransactions';
+import RightSidebar from '@/components/RightSidebar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AnimatePresence, motion } from 'framer-motion';
 
-const TransactionHistory = () => {
+const Home = () => {
+  const { user } = useAuth();
   const searchParams = useSearchParams();
+
   const [accounts, setAccounts] = useState<Account[]>([]);
+  const [totalBanks, setTotalBanks] = useState(0);
+  const [totalCurrentBalance, setTotalCurrentBalance] = useState(0);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
-  const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
 
   const accountId = searchParams.get('id') || '';
@@ -27,111 +30,111 @@ const TransactionHistory = () => {
       try {
         const accRes = await apiGetAccounts();
         if (accRes.success && accRes.data) {
-          setAccounts(accRes.data.accounts);
-          const activeId = accountId || accRes.data.accounts[0]?.id;
+          const { accounts: accs, totalBanks: tb, totalCurrentBalance: tcb } = accRes.data;
+          setAccounts(accs);
+          setTotalBanks(tb);
+          setTotalCurrentBalance(tcb);
+
+          const activeId = accountId || accs[0]?.id;
           if (activeId) {
-            const [detail, txn] = await Promise.all([
-              apiGetAccount(activeId),
-              apiGetAccountTransactions(activeId, { page: currentPage, limit: 20 }),
-            ]);
-            if (detail.success && detail.data) setSelectedAccount(detail.data.account);
-            if (txn.success && txn.data) {
-              setTransactions(txn.data.transactions);
-              setTotalPages(txn.data.pagination.totalPages);
+            const txnRes = await apiGetAccountTransactions(activeId, { limit: 10 });
+            if (txnRes.success && txnRes.data) {
+              setTransactions(txnRes.data.transactions);
             }
           }
         }
-      } catch (err) { console.error(err); }
-      finally { setLoading(false); }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
     };
     load();
-  }, [accountId, currentPage]);
+  }, [accountId]);
 
-  const activeId = accountId || accounts[0]?.id;
+  if (!user) return null;
 
   return (
-    <div className="no-scrollbar flex flex-col gap-8 p-5 py-8 sm:px-8 lg:py-10 xl:max-h-screen xl:overflow-y-auto">
-      <HeaderBox title="Transaction History" subtext="View detailed transaction records across your accounts." />
+    <section className="flex h-full w-full flex-row max-xl:max-h-screen max-xl:overflow-y-auto">
+      <div className="no-scrollbar flex flex-1 flex-col gap-8 p-5 py-8 sm:px-8 lg:py-10 xl:max-h-screen xl:overflow-y-auto">
+        <HeaderBox
+          type="greeting"
+          title="Welcome,"
+          user={user.firstName || 'Guest'}
+          subtext="Access and manage your account and transactions efficiently."
+        />
 
-      <AnimatePresence mode="wait">
-        {loading ? (
-          <motion.div
-            key="skeleton"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
-            className="flex flex-col gap-4"
-          >
-            <Skeleton className="h-24 rounded-2xl" />
-            <div className="flex gap-2">
-              {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-9 w-28 rounded-full" />)}
-            </div>
-            <div className="rounded-2xl border border-gray-100 bg-white">
-              <div className="flex flex-col gap-px">
-                {[...Array(8)].map((_, i) => (
-                  <div key={i} className="flex items-center gap-4 px-6 py-4">
-                    <Skeleton className="size-9 rounded-full shrink-0" />
-                    <div className="flex flex-1 flex-col gap-2">
-                      <Skeleton className="h-4 w-40" />
-                      <Skeleton className="h-3 w-24" />
-                    </div>
-                    <Skeleton className="h-4 w-20" />
-                    <Skeleton className="h-6 w-16 rounded-full" />
+        <AnimatePresence mode="wait">
+          {loading ? (
+            <motion.div
+              key="skeleton"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
+              className="flex flex-col gap-8"
+            >
+              <Skeleton className="h-40 rounded-2xl" />
+              <div className="flex flex-col gap-5">
+                <Skeleton className="h-6 w-48" />
+                <div className="rounded-2xl border border-gray-100 bg-white">
+                  <div className="flex flex-col gap-px">
+                    {[...Array(6)].map((_, i) => (
+                      <div key={i} className="flex items-center gap-4 px-6 py-4">
+                        <Skeleton className="size-9 shrink-0 rounded-full" />
+                        <div className="flex flex-1 flex-col gap-2">
+                          <Skeleton className="h-4 w-40" />
+                          <Skeleton className="h-3 w-24" />
+                        </div>
+                        <Skeleton className="h-4 w-20" />
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-        ) : (
-          <motion.div
-            key="content"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.25, ease: 'easeOut' }}
-            className="flex flex-col gap-8"
-          >
-            {/* Account balance card */}
-            {selectedAccount && (
-              <div className="flex flex-col gap-4 rounded-2xl bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-500 px-6 py-5 text-white shadow-lg shadow-blue-600/15 md:flex-row md:items-center md:justify-between">
-                <div>
-                  <p className="text-sm font-medium text-white/70">{selectedAccount.officialName || selectedAccount.name}</p>
-                  <p className="mt-0.5 text-lg font-bold tracking-wide">●●●● ●●●● ●●●● {selectedAccount.mask}</p>
-                </div>
-                <div className="rounded-xl bg-white/15 px-5 py-3 backdrop-blur-sm">
-                  <p className="text-[11px] font-medium uppercase tracking-wider text-white/60">Current Balance</p>
-                  <p className="text-xl font-bold">{formatAmount(selectedAccount.currentBalance)}</p>
                 </div>
               </div>
-            )}
+            </motion.div>
+          ) : (
+            <motion.div
+              key="content"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25, ease: 'easeOut' }}
+              className="flex flex-col gap-8"
+            >
+              <TotalBalanceBox
+                accounts={accounts}
+                totalBanks={totalBanks}
+                totalCurrentBalance={totalCurrentBalance}
+              />
 
-            {/* Account tabs — visible, scrollable, never clipped */}
-            {accounts.length > 1 && (
-              <div className="flex w-full flex-wrap gap-2">
-                {accounts.map((acc) => (
-                  <a key={acc.id} href={`/transaction-history?id=${acc.id}`}
-                    className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-all ${
-                      acc.id === activeId
-                        ? 'border-blue-200 bg-blue-50 text-blue-700'
-                        : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50'
-                    }`}>
-                    <span className={`flex size-5 items-center justify-center rounded-full text-[10px] font-bold ${
-                      acc.id === activeId ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-500'
-                    }`}>{acc.name[0]}</span>
-                    {acc.name}
-                  </a>
-                ))}
-              </div>
-            )}
+              {accounts.length > 0 ? (
+                <RecentTransactions
+                  accounts={accounts}
+                  transactions={transactions}
+                  selectedAccountId={accountId || accounts[0]?.id}
+                  page={currentPage}
+                />
+              ) : (
+                <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-white py-16 dark:border-gray-700 dark:bg-gray-900">
+                  <div className="mb-4 flex size-14 items-center justify-center rounded-full bg-blue-50 dark:bg-blue-950">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2" strokeLinecap="round">
+                      <rect x="3" y="5" width="18" height="14" rx="2" />
+                      <path d="M3 10h18" />
+                    </svg>
+                  </div>
+                  <p className="text-base font-semibold text-gray-900 dark:text-white">No accounts linked yet</p>
+                  <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Connect a bank to see your balances and recent activity.</p>
+                </div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
-            <TransactionsTable transactions={transactions} />
-            <Pagination page={currentPage} totalPages={totalPages} />
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+      <RightSidebar user={user} transactions={transactions} banks={accounts} />
+    </section>
   );
 };
 
-export default TransactionHistory;
+export default Home;

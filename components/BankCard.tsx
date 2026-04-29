@@ -1,14 +1,15 @@
-import { formatAmount } from '@/lib/utils';
+import { formatAmount, getBankDesign } from '@/lib/utils';
 import Image from 'next/image';
 import Link from 'next/link';
 import Copy from './Copy';
 
 const BankCard = ({ account, userName, showBalance = true }: CreditCardProps) => {
+  const { gradient, shadow, hoverShadow, cardType } = getBankDesign(account.name);
   return (
     <div className="flex flex-col">
       <Link
         href={`/transaction-history/?id=${account.id}`}
-        className="relative flex h-[190px] w-full justify-between overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400 shadow-lg shadow-blue-600/15 transition-[transform,box-shadow] duration-200 ease-out hover:scale-[1.02] hover:shadow-xl hover:shadow-blue-600/25 active:scale-[0.98] will-change-transform"
+        className={`relative flex h-[190px] w-full justify-between overflow-hidden rounded-2xl bg-gradient-to-br ${gradient} shadow-lg ${shadow} transition-[transform,box-shadow] duration-200 ease-out hover:scale-[1.02] hover:shadow-xl ${hoverShadow} active:scale-[0.98] will-change-transform`}
       >
         {/* Content */}
         <div className="relative z-10 flex flex-col justify-between p-5">
@@ -30,7 +31,10 @@ const BankCard = ({ account, userName, showBalance = true }: CreditCardProps) =>
         {/* Right side decoration */}
         <div className="flex flex-col items-end justify-between p-5">
           <Image src="/icons/Paypass.svg" width={20} height={24} alt="" className="opacity-80" />
-          <Image src="/icons/mastercard.svg" width={45} height={32} alt="" />
+          {cardType === 'visa'
+            ? <Image src="/icons/visa.svg" width={58} height={20} alt="Visa" />
+            : <Image src="/icons/mastercard.svg" width={45} height={32} alt="Mastercard" />
+          }
         </div>
         {/* Background circles */}
         <div className="absolute -right-6 -top-6 size-32 rounded-full bg-white/10" />

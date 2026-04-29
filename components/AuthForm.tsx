@@ -29,6 +29,20 @@ const AuthForm = ({ type }: AuthFormProps) => {
     defaultValues: { email: '', password: '' },
   });
 
+  const readableError = (msg?: string, fallback = 'Something went wrong') => {
+    if (!msg) return fallback;
+    // Backend wraps zod issues as a JSON-stringified array in the message field
+    try {
+      const parsed = JSON.parse(msg);
+      if (Array.isArray(parsed) && parsed.length) {
+        return parsed.map((p: { field?: string; message: string }) =>
+          p.field ? `${p.field}: ${p.message}` : p.message
+        ).join('\n');
+      }
+    } catch { /* not JSON — use as-is */ }
+    return msg;
+  };
+
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setIsLoading(true);
     try {
@@ -38,7 +52,7 @@ const AuthForm = ({ type }: AuthFormProps) => {
           setLocalUser(res.data.user);
           setUser(res.data.user);
         } else {
-          toast.error(res.error?.message || 'Registration failed');
+          toast.error(readableError(res.error?.message, 'Registration failed'));
         }
       } else {
         const res = await apiLogin({ email: data.email, password: data.password });
@@ -46,7 +60,7 @@ const AuthForm = ({ type }: AuthFormProps) => {
           setUser(res.data.user);
           router.push('/');
         } else {
-          toast.error(res.error?.message || 'Invalid credentials');
+          toast.error(readableError(res.error?.message, 'Invalid credentials'));
         }
       }
     } catch {

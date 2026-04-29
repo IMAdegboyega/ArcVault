@@ -115,9 +115,9 @@ const MyBanks = () => {
                 { label: 'Accounts', value: String(accounts.length) },
                 { label: 'Primary', value: accounts[0]?.name || '—' },
               ].map((stat) => (
-                <motion.div key={stat.label} variants={summaryItem} className="rounded-2xl border border-gray-100 bg-white px-4 py-4">
-                  <p className="text-[11px] font-medium uppercase tracking-wider text-gray-400">{stat.label}</p>
-                  <p className="mt-1 truncate text-xl font-bold text-gray-900">{stat.value}</p>
+                <motion.div key={stat.label} variants={summaryItem} className="rounded-2xl border border-gray-100 bg-white px-4 py-4 dark:border-gray-800 dark:bg-gray-900">
+                  <p className="text-[11px] font-medium uppercase tracking-wider text-gray-400 dark:text-gray-500">{stat.label}</p>
+                  <p className="mt-1 truncate text-xl font-bold text-gray-900 dark:text-white">{stat.value}</p>
                 </motion.div>
               ))}
             </motion.div>
@@ -135,7 +135,7 @@ const MyBanks = () => {
                   {/* #5 — Disconnect button */}
                   <button
                     onClick={() => setDisconnectDialog({ open: true, account })}
-                    className="mt-2 flex items-center gap-1.5 self-end rounded-md px-2 py-1 text-xs font-medium text-gray-400 transition-colors hover:bg-rose-50 hover:text-rose-500"
+                    className="mt-2 flex items-center gap-1.5 self-end rounded-md px-2 py-1 text-xs font-medium text-gray-400 transition-colors hover:bg-rose-50 hover:text-rose-500 dark:text-gray-600 dark:hover:bg-rose-950 dark:hover:text-rose-400"
                   >
                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                     Disconnect
@@ -151,13 +151,13 @@ const MyBanks = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25, ease: 'easeOut' }}
-            className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-white py-20"
+            className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-white py-20 dark:border-gray-700 dark:bg-gray-900"
           >
-            <div className="mb-4 flex size-14 items-center justify-center rounded-full bg-blue-50">
+            <div className="mb-4 flex size-14 items-center justify-center rounded-full bg-blue-50 dark:bg-blue-950">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2" strokeLinecap="round"><path d="M3 3v18h18"/><path d="M7 16l4-8 4 4 6-6"/></svg>
             </div>
-            <p className="text-base font-semibold text-gray-900">No bank accounts yet</p>
-            <p className="mt-1 text-sm text-gray-500">Click &quot;Connect Bank&quot; to link your first account.</p>
+            <p className="text-base font-semibold text-gray-900 dark:text-white">No bank accounts yet</p>
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Click &quot;Connect Bank&quot; to link your first account.</p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -166,20 +166,20 @@ const MyBanks = () => {
       {disconnectDialog.open && disconnectDialog.account && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
           onClick={(e) => { if (e.target === e.currentTarget) setDisconnectDialog({ open: false, account: null }); }}>
-          <div className="w-full max-w-[400px] overflow-hidden rounded-2xl bg-white shadow-2xl">
+          <div className="w-full max-w-[400px] overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-gray-900">
             <div className="px-6 py-5">
-              <div className="mb-4 flex size-11 items-center justify-center rounded-full bg-rose-50">
+              <div className="mb-4 flex size-11 items-center justify-center rounded-full bg-rose-50 dark:bg-rose-950">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e11d48" strokeWidth="2" strokeLinecap="round"><path d="m3 3 18 18"/><path d="M10.584 10.587a2 2 0 0 0 2.828 2.83"/><path d="M9.363 5.365A9.466 9.466 0 0 1 12 5c4.418 0 8 3.582 8 8 0 .823-.12 1.618-.34 2.37m-1.99 3.33A9.953 9.953 0 0 1 12 20c-4.418 0-8-3.582-8-8 0-1.48.405-2.867 1.11-4.05"/></svg>
               </div>
-              <h2 className="text-base font-semibold text-gray-900">Disconnect {disconnectDialog.account.name}?</h2>
-              <p className="mt-1.5 text-sm text-gray-500">
+              <h2 className="text-base font-semibold text-gray-900 dark:text-white">Disconnect {disconnectDialog.account.name}?</h2>
+              <p className="mt-1.5 text-sm text-gray-500 dark:text-gray-400">
                 This will remove the account and all associated transaction history. This action cannot be undone.
               </p>
             </div>
-            <div className="flex gap-3 border-t border-gray-100 px-6 py-4">
+            <div className="flex gap-3 border-t border-gray-100 px-6 py-4 dark:border-gray-800">
               <button
                 onClick={() => setDisconnectDialog({ open: false, account: null })}
-                className="flex-1 rounded-lg border border-gray-200 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+                className="flex-1 rounded-lg border border-gray-200 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
               >
                 Cancel
               </button>

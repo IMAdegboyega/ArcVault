@@ -22,7 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
   if (isLoading) {
     return (
-      <div className="flex h-screen w-full items-center justify-center bg-white">
+      <div className="flex h-screen w-full items-center justify-center bg-white dark:bg-gray-900">
         <div className="flex flex-col items-center gap-3">
           <div className="h-9 w-9 animate-spin rounded-full border-[3px] border-blue-600 border-t-transparent" />
           <p className="text-sm text-gray-400">Loading...</p>
@@ -38,10 +38,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <Sidebar user={user} />
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Mobile top bar */}
-        <header className="flex h-16 items-center justify-between border-b border-gray-100 bg-white px-5 sm:px-8 md:hidden">
+        <header className="flex h-16 items-center justify-between border-b border-gray-100 bg-white px-5 sm:px-8 md:hidden dark:border-gray-800 dark:bg-gray-900">
           <Link href="/" className="flex items-center gap-2">
             <Image src="/icons/logo.svg" width={28} height={28} alt="ArcVault" />
-            <span className="text-lg font-bold font-ibm-plex-serif text-gray-900">ArcVault</span>
+            <span className="text-lg font-bold font-ibm-plex-serif text-gray-900 dark:text-white">ArcVault</span>
           </Link>
           <MobileNav user={user} />
         </header>
@@ -52,7 +52,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.25, ease: 'easeOut' }}
-            className="flex-1 overflow-y-auto bg-gray-50/60"
+            className="flex-1 overflow-y-auto bg-gray-50/60 dark:bg-gray-950"
           >
             {children}
           </motion.div>
