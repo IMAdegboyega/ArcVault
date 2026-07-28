@@ -8,7 +8,7 @@ import HeaderBox from '@/components/HeaderBox';
 import { Pagination } from '@/components/Pagination';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatAmount, formatDateTime } from '@/lib/utils';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, type Variants } from 'framer-motion';
 
 const STATUS_STYLES: Record<string, string> = {
   COMPLETED:  'bg-emerald-50 text-emerald-700',
@@ -26,12 +26,12 @@ const STATUS_DOTS: Record<string, string> = {
   CANCELLED:  'bg-gray-400',
 };
 
-const rowVariants = {
+const rowVariants: Variants = {
   hidden: { opacity: 0, y: 8 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.2, ease: 'easeOut' } },
 };
 
-const tableVariants = {
+const tableVariants: Variants = {
   hidden: {},
   visible: { transition: { staggerChildren: 0.04 } },
 };

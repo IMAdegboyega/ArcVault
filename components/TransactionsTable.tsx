@@ -1,15 +1,15 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, type Variants } from 'framer-motion';
 import { formatAmount, formatDateTime, getTransactionStatus, removeSpecialCharacters } from '@/lib/utils';
 import { transactionCategoryStyles } from '@/constants';
 
-const rowVariants = {
+const rowVariants: Variants = {
   hidden: { opacity: 0, y: 8 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.2, ease: 'easeOut' } },
 };
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: {},
   visible: { transition: { staggerChildren: 0.04 } },
 };

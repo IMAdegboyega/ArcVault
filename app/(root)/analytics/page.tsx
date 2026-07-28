@@ -12,7 +12,7 @@ import { apiGetAccounts, apiGetAccountTransactions } from '@/lib/api';
 import HeaderBox from '@/components/HeaderBox';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatAmount } from '@/lib/utils';
-import { motion } from 'framer-motion';
+import { motion, type Variants } from 'framer-motion';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Title, Tooltip, Legend, Filler);
 
@@ -28,12 +28,12 @@ const CATEGORY_COLORS: Record<string, string> = {
   Other:          'rgb(156, 163, 175)',
 };
 
-const summaryItem = {
+const summaryItem: Variants = {
   hidden: { opacity: 0, y: 10 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.2, ease: 'easeOut' } },
 };
 
-const summaryContainer = {
+const summaryContainer: Variants = {
   hidden: {},
   visible: { transition: { staggerChildren: 0.05 } },
 };

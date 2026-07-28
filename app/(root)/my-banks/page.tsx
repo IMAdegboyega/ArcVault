@@ -8,25 +8,25 @@ import BankCard from '@/components/BankCard';
 import ConnectBank from '@/components/ConnectBank';
 import { formatAmount } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, type Variants } from 'framer-motion';
 import { toast } from 'sonner';
 
-const cardContainer = {
+const cardContainer: Variants = {
   hidden: {},
   visible: { transition: { staggerChildren: 0.06 } },
 };
 
-const cardItem = {
+const cardItem: Variants = {
   hidden: { opacity: 0, y: 16 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.25, ease: 'easeOut' } },
 };
 
-const summaryContainer = {
+const summaryContainer: Variants = {
   hidden: {},
   visible: { transition: { staggerChildren: 0.05 } },
 };
 
-const summaryItem = {
+const summaryItem: Variants = {
   hidden: { opacity: 0, y: 10 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.2, ease: 'easeOut' } },
 };
